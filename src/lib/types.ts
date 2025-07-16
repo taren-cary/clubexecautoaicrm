@@ -22,6 +22,7 @@ export interface B2BCall {
   needs_callback: boolean;
   callback_status: CallbackStatus;
   contact_id: number | null;
+  recording_url?: string | null;
 }
 
 export interface B2BContact {
@@ -56,6 +57,7 @@ export interface B2CCall {
   callback_status: CallbackStatus;
   notes: string;
   contact_id: number | null;
+  recording_url?: string | null;
 }
 
 export interface B2CContact {

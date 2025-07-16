@@ -4,6 +4,7 @@ import { Button } from '../ui/button';
 import { formatDate, formatDuration, formatAppointmentTime, getStatusColor } from '../../lib/utils';
 import { B2BCall, B2CCall } from '../../lib/types';
 import { Phone, Clock, User, Building2, Calendar, MessageSquare } from 'lucide-react';
+import { AudioPlayer } from '../audio/AudioPlayer';
 
 interface CallDetailModalProps {
   call: B2BCall | B2CCall | null;
@@ -90,6 +91,17 @@ export function CallDetailModal({ call, isOpen, onClose, onStatusToggle }: CallD
               </div>
             </div>
           </div>
+
+          {/* Audio Player */}
+          {call.recording_url && (
+            <div>
+              <h3 className="font-semibold mb-2">Call Recording</h3>
+              <AudioPlayer 
+                audioUrl={call.recording_url}
+                title={`${isB2B ? 'B2B' : 'B2C'} Call - ${call.phone_number}`}
+              />
+            </div>
+          )}
 
           {/* Call Summary */}
           {call.summary && (
