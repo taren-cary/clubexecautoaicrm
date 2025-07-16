@@ -130,10 +130,6 @@ export function CallDetailModal({ call, isOpen, onClose, onStatusToggle }: CallD
                     <span className="text-muted-foreground">Call Outcome:</span>
                     <span className="ml-2">{(call as B2BCall).call_outcome}</span>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Transfer Status:</span>
-                    <span className="ml-2">{(call as B2BCall).transfer_status}</span>
-                  </div>
                   {(call as B2BCall).callback_time && (
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
