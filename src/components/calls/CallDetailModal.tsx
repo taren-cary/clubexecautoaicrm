@@ -65,7 +65,7 @@ export function CallDetailModal({ call, isOpen, onClose, onStatusToggle }: CallD
               <div className="space-y-2 text-sm">
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span>{isB2B ? (call as B2BCall).decision_maker_name || 'Unknown' : (call as B2CCall).caller_name}</span>
+                  <span>{isB2B ? (call as B2BCall).name || 'Unknown' : (call as B2CCall).caller_name}</span>
                 </div>
                 
                 {isB2B && (call as B2BCall).decision_maker && (
@@ -123,6 +123,10 @@ export function CallDetailModal({ call, isOpen, onClose, onStatusToggle }: CallD
                 <h3 className="font-semibold mb-2">B2B Details</h3>
                 <div className="space-y-2 text-sm">
                   <div>
+                    <span className="text-muted-foreground">Contact Name:</span>
+                    <span className="ml-2">{(call as B2BCall).name || 'Unknown'}</span>
+                  </div>
+                  <div>
                     <span className="text-muted-foreground">Interest Level:</span>
                     <span className="ml-2">{(call as B2BCall).interest_level}</span>
                   </div>
@@ -134,6 +138,37 @@ export function CallDetailModal({ call, isOpen, onClose, onStatusToggle }: CallD
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span>{formatAppointmentTime((call as B2BCall).callback_time)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Decision Maker Information */}
+              <div>
+                <h3 className="font-semibold mb-2">Decision Maker Info</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-muted-foreground">Is Decision Maker:</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      (call as B2BCall).decision_maker 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-orange-100 text-orange-800'
+                    }`}>
+                      {(call as B2BCall).decision_maker ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  
+                  {(call as B2BCall).decision_maker_name && (
+                    <div>
+                      <span className="text-muted-foreground">Correct Decision Maker:</span>
+                      <span className="ml-2">{(call as B2BCall).decision_maker_name}</span>
+                    </div>
+                  )}
+                  
+                  {(call as B2BCall).decision_maker_email && (
+                    <div>
+                      <span className="text-muted-foreground">Decision Maker Email:</span>
+                      <span className="ml-2">{(call as B2BCall).decision_maker_email}</span>
                     </div>
                   )}
                 </div>

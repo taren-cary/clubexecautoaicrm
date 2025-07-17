@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { formatDate, formatDuration, formatAppointmentTime, getStatusColor } from '../../lib/utils';
 import { B2BCall, B2CCall } from '../../lib/types';
-import { Phone, Clock, User, Building2, Calendar } from 'lucide-react';
+import { Phone, Clock, User, Building2, Calendar, AlertCircle } from 'lucide-react';
 
 interface CallCardProps {
   call: B2BCall | B2CCall;
@@ -24,7 +24,7 @@ export function CallCard({ call, onStatusToggle, onViewDetails }: CallCardProps)
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">
-            {isB2B ? (call as B2BCall).decision_maker_name || 'Unknown Contact' : (call as B2CCall).caller_name}
+            {isB2B ? (call as B2BCall).name || 'Unknown Contact' : (call as B2CCall).caller_name}
           </CardTitle>
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(call.callback_status)}`}>
             {call.callback_status}
@@ -49,10 +49,31 @@ export function CallCard({ call, onStatusToggle, onViewDetails }: CallCardProps)
           <p className="text-muted-foreground">{formatDate(call.call_time)}</p>
         </div>
 
-        {isB2B && (call as B2BCall).decision_maker && (
-          <div className="flex items-center space-x-1 text-sm text-blue-600">
-            <Building2 className="h-4 w-4" />
-            <span>Decision Maker</span>
+        {/* B2B Decision Maker Information */}
+        {isB2B && (
+          <div className="space-y-2">
+            {!(call as B2BCall).decision_maker ? (
+              <div className="flex items-center space-x-1 text-sm text-orange-600">
+                <AlertCircle className="h-4 w-4" />
+                <span>Not Decision Maker</span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-1 text-sm text-blue-600">
+                <Building2 className="h-4 w-4" />
+                <span>Decision Maker</span>
+              </div>
+            )}
+            
+            {/* Show correct decision maker info if different from contact */}
+            {(call as B2BCall).decision_maker_name && (call as B2BCall).decision_maker_name !== (call as B2BCall).name && (
+              <div className="text-sm bg-blue-50 p-2 rounded">
+                <p className="font-medium text-blue-800">Correct Decision Maker:</p>
+                <p className="text-blue-700">{(call as B2BCall).decision_maker_name}</p>
+                {(call as B2BCall).decision_maker_email && (
+                  <p className="text-blue-600 text-xs">{(call as B2BCall).decision_maker_email}</p>
+                )}
+              </div>
+            )}
           </div>
         )}
 

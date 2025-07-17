@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SearchBar } from '../../components/filters/SearchBar';
 import { ContactCard } from '../../components/contacts/ContactCard';
-import { ContactEditModal } from '../../components/contacts/ContactEditModal';
+import { ContactDetailModal } from '../../components/contacts/ContactDetailModal';
 import { useB2CContacts } from '../../hooks/use-contacts';
 import { ContactFilters, B2BContact, B2CContact } from '../../lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -14,7 +14,7 @@ export function B2CContactsPage() {
     status: 'All',
   });
   const [selectedContact, setSelectedContact] = useState<B2CContact | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const { contacts, loading, error, refetch } = useB2CContacts(filters);
 
@@ -26,24 +26,27 @@ export function B2CContactsPage() {
     setFilters(prev => ({ ...prev, status }));
   };
 
-  const handleEditContact = (contact: B2BContact | B2CContact) => {
+  const handleViewContact = (contact: B2BContact | B2CContact) => {
     // Since this is B2C page, we know it's a B2C contact
     if (!('company' in contact)) {
       setSelectedContact(contact);
-      setIsEditModalOpen(true);
+      setIsDetailModalOpen(true);
     }
   };
 
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false);
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
     setSelectedContact(null);
   };
 
-  const handleSaveContact = () => {
-    refetch(); // Refresh the contacts list
+  const handleSaveContact = async () => {
+    // Refresh the contacts list
+    await refetch();
+    
+    // Close all modals
+    setIsDetailModalOpen(false);
+    setSelectedContact(null);
   };
-
-  // Remove handleAddContact function
 
   if (loading) {
     return (
@@ -70,7 +73,6 @@ export function B2CContactsPage() {
           <Users className="h-8 w-8 text-green-600" />
           <h1 className="text-3xl font-bold">B2C Contacts</h1>
         </div>
-        {/* Remove Add Contact button */}
       </div>
 
       {/* Filters */}
@@ -118,7 +120,7 @@ export function B2CContactsPage() {
           <ContactCard
             key={contact.id}
             contact={contact}
-            onEdit={handleEditContact}
+            onView={handleViewContact}
           />
         ))}
       </div>
@@ -134,7 +136,6 @@ export function B2CContactsPage() {
                 : 'No B2C contacts available.'
               }
             </p>
-            {/* Remove Add First Contact button */}
           </CardContent>
         </Card>
       )}
@@ -153,11 +154,11 @@ export function B2CContactsPage() {
         </Card>
       )}
 
-      {/* Edit Contact Modal */}
-      <ContactEditModal
+      {/* Contact Detail Modal */}
+      <ContactDetailModal
         contact={selectedContact}
-        isOpen={isEditModalOpen}
-        onClose={handleCloseEditModal}
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseDetailModal}
         onSave={handleSaveContact}
       />
     </div>

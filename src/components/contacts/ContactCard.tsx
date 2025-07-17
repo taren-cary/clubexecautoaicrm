@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { formatDate, getStatusColor } from '../../lib/utils';
 import { B2BContact, B2CContact } from '../../lib/types';
-import { User, Phone, Mail, Building2, Calendar } from 'lucide-react';
+import { User, Phone, Mail, Building2, Calendar, AlertCircle, Eye } from 'lucide-react';
 
 interface ContactCardProps {
   contact: B2BContact | B2CContact;
-  onEdit: (contact: B2BContact | B2CContact) => void;
+  onView: (contact: B2BContact | B2CContact) => void;
 }
 
-export function ContactCard({ contact, onEdit }: ContactCardProps) {
+export function ContactCard({ contact, onView }: ContactCardProps) {
   const isB2B = 'company' in contact;
 
   return (
@@ -18,9 +18,21 @@ export function ContactCard({ contact, onEdit }: ContactCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{contact.name}</CardTitle>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(contact.status)}`}>
-            {contact.status}
-          </span>
+          <div className="flex items-center space-x-2">
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(contact.status)}`}>
+              {contact.status}
+            </span>
+            {/* Decision Maker Badge for B2B */}
+            {isB2B && (
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                (contact as B2BContact).decision_maker 
+                  ? 'bg-blue-100 text-blue-800' 
+                  : 'bg-orange-100 text-orange-800'
+              }`}>
+                {(contact as B2BContact).decision_maker ? 'Decision Maker' : 'Not Decision Maker'}
+              </span>
+            )}
+          </div>
         </div>
       </CardHeader>
       
@@ -73,10 +85,11 @@ export function ContactCard({ contact, onEdit }: ContactCardProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onEdit(contact)}
+          onClick={() => onView(contact)}
           className="w-full"
         >
-          Edit Contact
+          <Eye className="h-4 w-4 mr-2" />
+          View Details
         </Button>
       </CardContent>
     </Card>

@@ -6,6 +6,7 @@ export type ContactStatus = 'Needs Attention' | 'Contacted';
 export interface B2BCall {
   id: number;
   call_id: string;
+  name: string | null;
   phone_number: string;
   call_time: string;
   duration: number;
