@@ -3,8 +3,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
 import { DualLayout } from './components/layout/DualLayout';
-import { B2CCallsPage } from './pages/b2c/CallsPage';
-import { B2CContactsPage } from './pages/b2c/ContactsPage';
 import { B2BCallsPage } from './pages/b2b/CallsPage';
 import { B2BContactsPage } from './pages/b2b/ContactsPage';
 
@@ -23,14 +21,14 @@ function App() {
             </ProtectedRoute>
           }>
             <Route index element={<Navigate to="/b2b/calls" replace />} />
-            <Route path="b2c">
-              <Route path="calls" element={<B2CCallsPage />} />
-              <Route path="contacts" element={<B2CContactsPage />} />
-            </Route>
             <Route path="b2b">
               <Route path="calls" element={<B2BCallsPage />} />
               <Route path="contacts" element={<B2BContactsPage />} />
             </Route>
+            {/* Redirect any B2C routes to B2B */}
+            <Route path="b2c/*" element={<Navigate to="/b2b/calls" replace />} />
+            {/* Catch-all redirect to B2B */}
+            <Route path="*" element={<Navigate to="/b2b/calls" replace />} />
           </Route>
         </Routes>
       </Router>
