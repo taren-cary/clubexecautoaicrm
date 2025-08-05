@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Textarea } from '../ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { B2BContact, B2CContact, ContactStatus } from '../../lib/types';
-import { supabase, TABLES } from '../../lib/supabase';
-import { Loader2, Save, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface ContactEditModalProps {
   contact: B2BContact | B2CContact | null;
@@ -16,18 +14,21 @@ interface ContactEditModalProps {
 }
 
 export function ContactEditModal({ contact, isOpen, onClose, onSave }: ContactEditModalProps) {
-  const [formData, setFormData] = useState<Partial<B2BContact | B2CContact>>({});
+  const [formData, setFormData] = useState({
+    name: contact?.name || '',
+    email: contact?.email || '',
+    phone: contact?.phone || '',
+    status: contact?.status || 'Needs Attention',
+    notes: contact?.notes || '',
+    company: (contact as B2BContact)?.company || '',
+    role: (contact as B2BContact)?.role || '',
+    decision_maker: (contact as B2BContact)?.decision_maker || false,
+    service_interest: (contact as B2CContact)?.service_interest || '',
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isB2B = contact && 'company' in contact;
-
-  useEffect(() => {
-    if (contact) {
-      setFormData(contact);
-      setError(null);
-    }
-  }, [contact]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -44,7 +45,9 @@ export function ContactEditModal({ contact, isOpen, onClose, onSave }: ContactEd
     setError(null);
 
     try {
+      const { supabase, TABLES } = await import('../../lib/supabase');
       const table = isB2B ? TABLES.B2B_CONTACTS : TABLES.B2C_CONTACTS;
+
       const { error } = await supabase
         .from(table)
         .update({
@@ -174,6 +177,7 @@ export function ContactEditModal({ contact, isOpen, onClose, onSave }: ContactEd
             <Label>Status</Label>
             <div className="flex space-x-2">
               <Button
+                type="button"
                 variant={formData.status === 'Needs Attention' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => handleStatusChange('Needs Attention')}
@@ -181,6 +185,7 @@ export function ContactEditModal({ contact, isOpen, onClose, onSave }: ContactEd
                 Needs Attention
               </Button>
               <Button
+                type="button"
                 variant={formData.status === 'Contacted' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => handleStatusChange('Contacted')}
@@ -190,29 +195,41 @@ export function ContactEditModal({ contact, isOpen, onClose, onSave }: ContactEd
             </div>
           </div>
 
-          {/* B2B Decision Maker */}
+          {/* Decision Maker (B2B only) */}
           {isB2B && (
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="decision_maker"
-                checked={formData.decision_maker || false}
-                onChange={(e) => handleInputChange('decision_maker', e.target.checked)}
-                className="rounded"
-              />
-              <Label htmlFor="decision_maker">Decision Maker</Label>
+            <div className="space-y-2">
+              <Label>Decision Maker</Label>
+              <div className="flex space-x-2">
+                <Button
+                  type="button"
+                  variant={formData.decision_maker ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFormData(prev => ({ ...prev, decision_maker: true }))}
+                >
+                  Yes
+                </Button>
+                <Button
+                  type="button"
+                  variant={!formData.decision_maker ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFormData(prev => ({ ...prev, decision_maker: false }))}
+                >
+                  No
+                </Button>
+              </div>
             </div>
           )}
 
           {/* Notes */}
           <div className="space-y-2">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea
+            <textarea
               id="notes"
               value={formData.notes || ''}
               onChange={(e) => handleInputChange('notes', e.target.value)}
               placeholder="Additional notes..."
-              rows={3}
+              className="w-full p-3 border border-input rounded-md resize-none"
+              rows={4}
             />
           </div>
 
@@ -220,17 +237,12 @@ export function ContactEditModal({ contact, isOpen, onClose, onSave }: ContactEd
           <div className="flex space-x-2 pt-4 border-t">
             <Button
               onClick={handleSave}
-              disabled={loading || !formData.name || !formData.phone}
-              className="flex items-center space-x-2"
+              disabled={loading}
+              className="flex-1"
             >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
-              <span>Save Changes</span>
+              {loading ? 'Saving...' : 'Save Changes'}
             </Button>
-            <Button variant="outline" onClick={onClose} disabled={loading}>
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
           </div>

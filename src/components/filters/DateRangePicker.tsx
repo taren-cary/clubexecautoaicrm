@@ -1,37 +1,31 @@
-import React, { useState } from 'react';
-import { Calendar, X } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '../ui/button';
+import { Calendar } from 'lucide-react';
 import { DateRange } from '../../lib/types';
-import { format } from 'date-fns';
 
 interface DateRangePickerProps {
-  dateRange: DateRange;
-  onDateRangeChange: (range: DateRange) => void;
+  value: DateRange;
+  onChange: (range: DateRange) => void;
 }
 
-export function DateRangePicker({ dateRange, onDateRangeChange }: DateRangePickerProps) {
+export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleQuickSelect = (days: number) => {
-    const to = new Date();
-    const from = new Date();
-    from.setDate(from.getDate() - days);
-    onDateRangeChange({ from, to });
-    setIsOpen(false);
+  const handleDateChange = (type: 'from' | 'to', date: string) => {
+    const newDate = date ? new Date(date) : null;
+    onChange({
+      ...value,
+      [type]: newDate,
+    });
   };
 
   const clearDates = () => {
-    onDateRangeChange({ from: null, to: null });
+    onChange({ from: null, to: null });
   };
 
-  const formatDateRange = () => {
-    if (!dateRange.from && !dateRange.to) return 'Select dates';
-    if (dateRange.from && dateRange.to) {
-      return `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d, yyyy')}`;
-    }
-    if (dateRange.from) return `From ${format(dateRange.from, 'MMM d, yyyy')}`;
-    if (dateRange.to) return `Until ${format(dateRange.to, 'MMM d, yyyy')}`;
-    return 'Select dates';
+  const formatDate = (date: Date | null) => {
+    if (!date) return '';
+    return date.toISOString().split('T')[0];
   };
 
   return (
@@ -39,89 +33,45 @@ export function DateRangePicker({ dateRange, onDateRangeChange }: DateRangePicke
       <Button
         variant="outline"
         onClick={() => setIsOpen(!isOpen)}
-        className="justify-start text-left font-normal"
+        className="flex items-center space-x-2"
       >
-        <Calendar className="mr-2 h-4 w-4" />
-        {formatDateRange()}
+        <Calendar className="h-4 w-4" />
+        <span>
+          {value.from && value.to
+            ? `${formatDate(value.from)} - ${formatDate(value.to)}`
+            : 'Select date range'}
+        </span>
       </Button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-64 bg-card border rounded-md shadow-lg z-50">
-          <div className="p-3">
-            <div className="space-y-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => handleQuickSelect(0)}
-              >
-                Today
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => handleQuickSelect(7)}
-              >
-                Last 7 days
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => handleQuickSelect(30)}
-              >
-                Last 30 days
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => handleQuickSelect(90)}
-              >
-                Last 90 days
-              </Button>
-            </div>
-            
-            <div className="mt-3 pt-3 border-t">
-              <div className="flex space-x-2">
+        <div className="absolute top-full left-0 mt-1 p-4 bg-background border rounded-md shadow-lg z-10 min-w-[300px]">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">From</label>
                 <input
                   type="date"
-                  value={dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : ''}
-                  onChange={(e) => {
-                    const date = e.target.value ? new Date(e.target.value) : null;
-                    onDateRangeChange({ ...dateRange, from: date });
-                  }}
-                  className="flex-1 px-2 py-1 text-sm border rounded"
+                  value={formatDate(value.from)}
+                  onChange={(e) => handleDateChange('from', e.target.value)}
+                  className="w-full p-2 border rounded-md"
                 />
-                <span className="text-muted-foreground">to</span>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">To</label>
                 <input
                   type="date"
-                  value={dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : ''}
-                  onChange={(e) => {
-                    const date = e.target.value ? new Date(e.target.value) : null;
-                    onDateRangeChange({ ...dateRange, to: date });
-                  }}
-                  className="flex-1 px-2 py-1 text-sm border rounded"
+                  value={formatDate(value.to)}
+                  onChange={(e) => handleDateChange('to', e.target.value)}
+                  className="w-full p-2 border rounded-md"
                 />
               </div>
             </div>
-
-            <div className="mt-3 pt-3 border-t flex justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearDates}
-                className="text-destructive"
-              >
-                <X className="h-4 w-4 mr-1" />
-                Clear
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => setIsOpen(false)}
-              >
+            <div className="flex space-x-2">
+              <Button size="sm" onClick={() => setIsOpen(false)}>
                 Apply
+              </Button>
+              <Button size="sm" variant="outline" onClick={clearDates}>
+                Clear
               </Button>
             </div>
           </div>

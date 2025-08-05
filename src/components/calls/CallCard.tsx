@@ -1,9 +1,8 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { formatDate, formatDuration, formatAppointmentTime, getStatusColor } from '../../lib/utils';
 import { B2BCall, B2CCall } from '../../lib/types';
-import { Phone, Clock, User, Building2, Calendar, AlertCircle } from 'lucide-react';
+import { Phone, Clock, Building2, Calendar, AlertCircle } from 'lucide-react';
 
 interface CallCardProps {
   call: B2BCall | B2CCall;

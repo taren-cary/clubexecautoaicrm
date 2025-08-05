@@ -1,10 +1,9 @@
-import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Button } from '../ui/button';
-import { formatDate, formatDuration, formatAppointmentTime, getStatusColor } from '../../lib/utils';
-import { B2BCall, B2CCall } from '../../lib/types';
-import { Phone, Clock, User, Building2, Calendar, MessageSquare } from 'lucide-react';
 import { AudioPlayer } from '../audio/AudioPlayer';
+import { formatDate, formatDuration, formatAppointmentTime } from '../../lib/utils';
+import { B2BCall, B2CCall } from '../../lib/types';
+import { Phone, Clock, Calendar, MessageSquare, Building2 } from 'lucide-react';
 
 interface CallDetailModalProps {
   call: B2BCall | B2CCall | null;
@@ -17,7 +16,7 @@ export function CallDetailModal({ call, isOpen, onClose, onStatusToggle }: CallD
   if (!call) return null;
 
   const isB2B = 'decision_maker' in call;
-
+  
   const handleStatusToggle = () => {
     const newStatus = call.callback_status === 'Need Callback' ? 'Confirmed' : 'Need Callback';
     onStatusToggle(call.id, newStatus);
@@ -53,7 +52,11 @@ export function CallDetailModal({ call, isOpen, onClose, onStatusToggle }: CallD
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-muted-foreground">Status:</span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(call.callback_status)}`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    call.callback_status === 'Need Callback' 
+                      ? 'bg-orange-100 text-orange-800' 
+                      : 'bg-green-100 text-green-800'
+                  }`}>
                     {call.callback_status}
                   </span>
                 </div>
@@ -64,7 +67,7 @@ export function CallDetailModal({ call, isOpen, onClose, onStatusToggle }: CallD
               <h3 className="font-semibold mb-2">Contact Information</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">Name:</span>
                   <span>{isB2B ? (call as B2BCall).name || 'Unknown' : (call as B2CCall).caller_name}</span>
                 </div>
                 
