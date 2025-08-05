@@ -1,12 +1,19 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Building2, Users, Phone, UserCheck } from 'lucide-react';
+import { Building2, Users, Phone, UserCheck, LogOut } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useAuth } from '../../contexts/AuthContext';
+import { Button } from '../ui/button';
 import logo from '../../assets/logo.png';
 
 export function Navigation() {
   const location = useLocation();
   const isB2B = location.pathname.startsWith('/b2b');
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <nav className="border-b bg-card">
@@ -107,6 +114,17 @@ export function Navigation() {
                 </Link>
               </>
             )}
+            
+            {/* Logout Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSignOut}
+              className="flex items-center space-x-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </Button>
           </div>
         </div>
       </div>
