@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ContactCard } from '../../components/contacts/ContactCard';
 import { ContactDetailModal } from '../../components/contacts/ContactDetailModal';
 import { ContactEditModal } from '../../components/contacts/ContactEditModal';
@@ -12,7 +12,10 @@ export function B2BContactsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [search, setSearch] = useState('');
 
-  const { contacts, loading, error, refetch } = useB2BContacts({ search, status: 'All' });
+  // Memoize the filters object to prevent infinite re-renders
+  const filters = useMemo(() => ({ search, status: 'All' as const }), [search]);
+
+  const { contacts, loading, error, refetch } = useB2BContacts(filters);
 
   const handleViewDetails = (contact: B2BContact | B2CContact) => {
     if ('company' in contact) {
