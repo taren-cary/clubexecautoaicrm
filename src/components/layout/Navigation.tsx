@@ -14,18 +14,19 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Left side - Interface Toggle */}
           <div className="flex items-center space-x-1 bg-muted rounded-lg p-1">
-            <Link
-              to="/b2c/calls"
+            {/* B2C Tab - Disabled */}
+            <div
               className={cn(
-                "flex items-center space-x-2 px-3 py-1 rounded-md text-sm font-medium transition-colors",
+                "flex items-center space-x-2 px-3 py-1 rounded-md text-sm font-medium transition-colors cursor-not-allowed opacity-50",
                 !isB2B 
                   ? "bg-background text-foreground shadow-sm" 
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground"
               )}
+              title="B2C functionality coming soon"
             >
               <Users className="h-4 w-4" />
               <span>B2C</span>
-            </Link>
+            </div>
             <Link
               to="/b2b/calls"
               className={cn(
